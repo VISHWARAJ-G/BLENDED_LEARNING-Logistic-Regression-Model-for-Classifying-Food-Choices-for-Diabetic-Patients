@@ -94,7 +94,7 @@ print("Predicted Outcome for New Patient:", "Diabetic" if pred_diabetes[0] == 1 
 ```
 
 ## Output:
-![alt text](Exp-6-Output.PNG)
-![alt text](Exp-6-Chart.PNG)
+![alt text](Exp-6-Output-1.PNG)
+![alt text](Exp-6-Chart-1.PNG)
 ## Result:
 Thus, the logistic regression model was successfully implemented to classify food items for diabetic patients based on nutritional information, and the model's performance was evaluated using various performance metrics such as accuracy, precision, and recall.

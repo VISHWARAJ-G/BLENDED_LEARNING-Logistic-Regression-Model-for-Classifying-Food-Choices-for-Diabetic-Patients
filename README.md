@@ -23,78 +23,63 @@ Program to implement Logistic Regression for classifying food choices based on n
 Developed by: Vishwaraj G
 RegisterNumber:  212223220125
 */
-# Importing necessary libraries
 import pandas as pd
-import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import accuracy_score, confusion_matrix, classification_report, roc_curve
-from sklearn.preprocessing import StandardScaler
-import matplotlib.pyplot as plt
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, confusion_matrix, classification_report
 import seaborn as sns
+import matplotlib.pyplot as plt
 
-# Load the Pima Indians Diabetes Dataset from GitHub
-data_url = 'https://raw.githubusercontent.com/jbrownlee/Datasets/master/pima-indians-diabetes.data.csv'
-column_names = ['Pregnancies', 'Glucose', 'BloodPressure', 'SkinThickness', 'Insulin', 
-                'BMI', 'DiabetesPedigreeFunction', 'Age', 'Outcome']
-data = pd.read_csv(data_url, names=column_names)
+# Load the dataset
+url = "https://cf-courses-data.s3.us.cloud-object-storage.appdomain.cloud/IBM-ML241EN-SkillsNetwork/labs/datasets/food_items.csv"
+df = pd.read_csv(url)
 
-# Display the first few rows of the dataset
-print("Dataset Head:")
-print(data.head())
+# Inspect the dataset
+print("Dataset Overview:")
+print(df.head())
+print("\nDataset Info:")
+print(df.info())
 
-# Data Preprocessing
-# Selecting feature columns (X) and target column (y)
-X = data[['Glucose', 'BloodPressure', 'BMI', 'Age']]  # You can add or remove features based on your analysis
-y = data['Outcome']  # Target column (0 for non-diabetic, 1 for diabetic)
+# Encode the target column ('class') into binary labels
+# Assuming 'Diabetic' means classifying 'In Moderation' as 1 (diabetic-friendly) and others as 0
+df['class'] = df['class'].str.strip("'")  # Remove surrounding quotes
+df['Diabetic'] = df['class'].apply(lambda x: 1 if x == 'In Moderation' else 0)
 
-# Handling Missing Values (if any) by replacing with mean
-X = X.fillna(X.mean())
+# Define features and target
+X = df.drop(columns=['class', 'Diabetic'])  # Features
+y = df['Diabetic']  # Target variable
 
-# Feature Scaling
-scaler = StandardScaler()
-X = scaler.fit_transform(X)
-
-# Split the data into training and testing sets
+# Split the dataset into training and testing sets
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-# Initialize and Train the Logistic Regression model
-model = LogisticRegression(max_iter=1000)  # Increased max_iter for convergence
-model.fit(X_train, y_train)
+# Train the Logistic Regression model
+log_reg = LogisticRegression(max_iter=1000, random_state=42)
+log_reg.fit(X_train, y_train)
 
-# Model Prediction
-y_pred = model.predict(X_test)
+# Make predictions
+y_pred = log_reg.predict(X_test)
 
-# Model Evaluation
-accuracy = accuracy_score(y_test, y_pred)
+# Evaluate the model
+print("\nModel Evaluation:")
+print("Accuracy:", accuracy_score(y_test, y_pred))
+print("Precision:", precision_score(y_test, y_pred))
+print("Recall:", recall_score(y_test, y_pred))
+print("F1 Score:", f1_score(y_test, y_pred))
+print("\nClassification Report:")
+print(classification_report(y_test, y_pred))
+
+# Confusion Matrix
 conf_matrix = confusion_matrix(y_test, y_pred)
-class_report = classification_report(y_test, y_pred)
-
-print("Model Accuracy:", accuracy)
-print("Confusion Matrix:\n", conf_matrix)
-print("Classification Report:\n", class_report)
-
-
-# Confusion Matrix Plot
-plt.figure(figsize=(5, 4))
-sns.heatmap(conf_matrix, annot=True, fmt='d', cmap='coolwarm', cbar=False, 
-            xticklabels=['Non-Diabetic', 'Diabetic'], yticklabels=['Non-Diabetic', 'Diabetic'])
-plt.title("Confusion Matrix")
-plt.xlabel("Predicted")
-plt.ylabel("Actual")
+plt.figure(figsize=(8, 6))
+sns.heatmap(conf_matrix, annot=True, fmt='d', cmap='Blues', xticklabels=['Non-Diabetic', 'Diabetic'], yticklabels=['Non-Diabetic', 'Diabetic'])
+plt.title('Confusion Matrix')
+plt.xlabel('Predicted')
+plt.ylabel('Actual')
 plt.show()
-
-# Example prediction (Assuming a new patient with example health values)
-new_patient = np.array([[130, 70, 28.5, 45]])  # Replace with actual values for Glucose, BloodPressure, BMI, Age
-new_patient_scaled = scaler.transform(new_patient)
-pred_diabetes = model.predict(new_patient_scaled)
-
-print("Predicted Outcome for New Patient:", "Diabetic" if pred_diabetes[0] == 1 else "Non-Diabetic")
-
 ```
 
 ## Output:
-![alt text](Exp-6-Output-1.PNG)
-![alt text](Exp-6-Chart-1.PNG)
+![alt text](Exp-6-Output.PNG)
+![alt text](Exp-6-Chart.PNG) 
 ## Result:
 Thus, the logistic regression model was successfully implemented to classify food items for diabetic patients based on nutritional information, and the model's performance was evaluated using various performance metrics such as accuracy, precision, and recall.
